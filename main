@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+home=$PWD
+flags=(
+    -fdiagnostics-color=always
+    -Wall
+    -Wcompat
+    -Werror
+    -Wincomplete-record-updates
+    -Wincomplete-uni-patterns
+    -Wmissing-export-lists
+    -Wno-unused-top-binds
+    -Wpartial-fields
+)
+files=(
+    "randf.c"
+    "main.hs"
+)
+
+cppcheck \
+    --enable=all \
+    --suppress=missingIncludeSystem \
+    --suppress=unusedFunction  \
+    "$WD/src" \
+    | sed 's/ \.\.\.//g'
+for x in c h; do
+    clang-format -i -verbose "$WD/src"/*."$x"
+done
+for x in "$WD/src"/*.hs; do
+    echo "Checking $x"
+    hlint "$x"
+    echo "Formatting $x"
+    ormolu -m inplace "$x"
+done
+
+(
+    cp "$WD/src"/* "$WD/build"
+    cd "$WD/build"
+    ghc "${flags[@]}" -o "$WD/bin/main" "${files[@]}"
+    cd "$home"
+    "$WD/bin/main"
+)

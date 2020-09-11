@@ -1,0 +1,10 @@
+*
+!.gitignore
+!*.nix
+!.shellhook
+!.clang-format
+!src/
+!*.hs
+!*.c
+!*.h
+!main
