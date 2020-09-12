@@ -1,23 +1,23 @@
 {-# LANGUAGE ForeignFunctionInterface #-}
 
 import Control.Monad (replicateM_)
-import Foreign.C.Types (CFloat (..), CUInt (..))
+import Foreign.C.Types (CFloat (..), CULong (..))
 
-foreign import ccall "srand" c_seed :: CUInt -> IO ()
+foreign import ccall "set_seed" c_set_seed :: CULong -> CULong -> IO ()
 
-seed :: Int -> IO ()
-seed = c_seed . fromIntegral . (+ 1)
+foreign import ccall "get_random_f32" c_get_random_f32 :: IO CFloat
 
-foreign import ccall "randf" c_rand :: IO CFloat
+setSeed :: Int -> Int -> IO ()
+setSeed s i = c_set_seed (fromIntegral s) (fromIntegral i)
 
-rand :: IO Float
-rand = realToFrac <$> c_rand
+getRandom :: IO Float
+getRandom = realToFrac <$> c_get_random_f32
 
 partitionM :: Monad m => (a -> m Bool) -> [a] -> m ([a], [a])
 partitionM _ [] = return ([], [])
 partitionM f (x : xs) = do
-  p <- f x
   (l, r) <- partitionM f xs
+  p <- f x
   if p
     then return (x : l, r)
     else return (l, x : r)
@@ -29,14 +29,14 @@ shuffle :: [a] -> IO [a]
 shuffle [] = return []
 shuffle [x] = return [x]
 shuffle xs = do
-  (l, r) <- partitionM (\_ -> (< 0.5) <$> rand) xs
+  (l, r) <- partitionM (\_ -> (< 0.5) <$> getRandom) xs
   (++) <$> shuffle l <*> shuffle r
 
 main :: IO ()
 main = do
-  seed 0
-  replicateM_ 10 $ rand >>= print
-  partitionM (\_ -> (< 0.5) <$> rand) xs >>= print
+  setSeed 0 0
+  replicateM_ 10 $ getRandom >>= print
+  partitionM (\_ -> (< 0.5) <$> getRandom) xs >>= print
   replicateM_ 3 $ shuffle xs >>= print
   where
     xs = [1 .. 10 :: Int]

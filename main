@@ -2,23 +2,6 @@
 
 set -euo pipefail
 
-home=$PWD
-flags=(
-    -fdiagnostics-color=always
-    -Wall
-    -Wcompat
-    -Werror
-    -Wincomplete-record-updates
-    -Wincomplete-uni-patterns
-    -Wmissing-export-lists
-    -Wno-unused-top-binds
-    -Wpartial-fields
-)
-files=(
-    "randf.c"
-    "main.hs"
-)
-
 cppcheck \
     --enable=all \
     --suppress=missingIncludeSystem \
@@ -36,6 +19,22 @@ for x in "$WD/src"/*.hs; do
 done
 
 (
+    home=$PWD
+    flags=(
+        -fdiagnostics-color=always
+        -Wall
+        -Wcompat
+        -Werror
+        -Wincomplete-record-updates
+        -Wincomplete-uni-patterns
+        -Wmissing-export-lists
+        -Wno-unused-top-binds
+        -Wpartial-fields
+    )
+    files=(
+        "pcg_random.c"
+        "main.hs"
+    )
     cp "$WD/src"/* "$WD/build"
     cd "$WD/build"
     ghc "${flags[@]}" -o "$WD/bin/main" "${files[@]}"
