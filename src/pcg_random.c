@@ -1,7 +1,6 @@
-#include <math.h>
-#include <stdint.h>
-
 #include "pcg_random.h"
+
+#include <math.h>
 
 typedef uint32_t u32;
 
