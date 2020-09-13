@@ -32,8 +32,8 @@ shuffle xs = do
   (l, r) <- partitionM (\_ -> (< 0.5) <$> getRandom) xs
   (++) <$> shuffle l <*> shuffle r
 
-printIndent :: String -> IO ()
-printIndent x = do
+putTabStrLn :: String -> IO ()
+putTabStrLn x = do
   putStr "\t"
   putStrLn x
 
@@ -41,16 +41,16 @@ main :: IO ()
 main = do
   setSeed 0 0
   putStrLn "\nreplicateM_ 10 $ getRandom"
-  replicateM_ 10 $ getRandom >>= printIndent . show
+  replicateM_ 10 $ getRandom >>= putTabStrLn . show
   putStrLn $ "\nreplicateM " ++ show n ++ " getRandom"
   xs' <- replicateM n getRandom
-  printIndent $ "mean : " ++ show (sum xs' / (fromIntegral n :: Float))
-  printIndent $ "max  : " ++ show (maximum xs')
-  printIndent $ "min  : " ++ show (minimum xs')
+  putTabStrLn $ "mean : " ++ show (sum xs' / (fromIntegral n :: Float))
+  putTabStrLn $ "max  : " ++ show (maximum xs')
+  putTabStrLn $ "min  : " ++ show (minimum xs')
   putStrLn $ "\npartitionM (\\_ -> (< 0.5) <$> getRandom) " ++ show xs
-  partitionM (\_ -> (< 0.5) <$> getRandom) xs >>= printIndent . show
+  partitionM (\_ -> (< 0.5) <$> getRandom) xs >>= putTabStrLn . show
   putStrLn $ "\nreplicateM_ 3 $ shuffle " ++ show xs
-  replicateM_ 3 $ shuffle xs >>= printIndent . show
+  replicateM_ 3 $ shuffle xs >>= putTabStrLn . show
   where
     xs = [1 .. 10 :: Int]
     n = 100000 :: Int
