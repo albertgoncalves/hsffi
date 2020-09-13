@@ -22,6 +22,7 @@ done
     home=$PWD
     flags=(
         -fdiagnostics-color=always
+        -outputdir "$WD/build"
         -Wall
         -Wcompat
         -Werror
@@ -35,9 +36,7 @@ done
         "pcg_random.c"
         "main.hs"
     )
-    cp "$WD/src"/* "$WD/build"
-    cd "$WD/build"
+    cd "$WD/src"
     ghc "${flags[@]}" -o "$WD/bin/main" "${files[@]}"
-    cd "$home"
     "$WD/bin/main"
 )
