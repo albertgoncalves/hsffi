@@ -1,12 +1,13 @@
 {-# LANGUAGE ForeignFunctionInterface #-}
 
 import Control.Monad (replicateM, replicateM_)
-import Foreign.C.Types (CFloat (..), CULong (..))
+import Data.Word (Word64)
+import Foreign.C.Types (CFloat (..))
 
-foreign import ccall "set_seed" c_set_seed :: CULong -> CULong -> IO ()
+foreign import ccall "set_seed" c_set_seed :: Word64 -> Word64 -> IO ()
 
-setSeed :: Int -> Int -> IO ()
-setSeed s i = c_set_seed (fromIntegral s) (fromIntegral i)
+setSeed :: Word64 -> Word64 -> IO ()
+setSeed = c_set_seed
 
 foreign import ccall "get_random_f32" c_get_random_f32 :: IO CFloat
 
@@ -44,7 +45,7 @@ main = do
   replicateM_ 10 $ getRandom >>= putTabStrLn . show
   putStrLn $ "\nreplicateM " ++ show n ++ " getRandom"
   xs' <- replicateM n getRandom
-  putTabStrLn $ "mean : " ++ show (sum xs' / (fromIntegral n :: Float))
+  putTabStrLn $ "mean : " ++ show (sum xs' / fromIntegral n)
   putTabStrLn $ "max  : " ++ show (maximum xs')
   putTabStrLn $ "min  : " ++ show (minimum xs')
   putStrLn $ "\npartitionM (\\_ -> (< 0.5) <$> getRandom) " ++ show xs
