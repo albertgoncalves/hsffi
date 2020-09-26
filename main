@@ -34,7 +34,7 @@ done
     )
     files=(
         "pcg_random.c"
-        "main.hs"
+        "Main.hs"
     )
     cd "$WD/src"
     ghc "${flags[@]}" -o "$WD/bin/main" "${files[@]}"
