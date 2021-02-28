@@ -19,7 +19,6 @@ for x in "$WD/src"/*.hs; do
 done
 
 (
-    home=$PWD
     flags=(
         -fdiagnostics-color=always
         -outputdir "$WD/build"
