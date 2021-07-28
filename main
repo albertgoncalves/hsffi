@@ -2,34 +2,68 @@
 
 set -euo pipefail
 
-cppcheck \
-    --enable=all \
-    --suppress=missingIncludeSystem \
-    --suppress=unusedFunction  \
-    "$WD/src" \
-    | sed 's/ \.\.\.//g'
-for x in c h; do
-    clang-format -i -verbose "$WD/src"/*."$x"
-done
-for x in "$WD/src"/*.hs; do
-    echo "Checking $x"
-    hlint "$x"
-    echo "Formatting $x"
-    ormolu -m inplace "$x"
-done
-
+(
+    (
+        cppcheck \
+            --enable=all \
+            --suppress=missingIncludeSystem \
+            --suppress=unusedFunction  \
+            "$WD/src" \
+            | sed 's/ \.\.\.//g'
+        for x in c h; do
+            clang-format -i -verbose "$WD/src"/*."$x"
+        done
+    ) &
+    for x in "$WD/src"/*.hs; do
+        (
+            echo "Checking $x"
+            hlint "$x"
+            echo "Formatting $x"
+            ormolu -m inplace "$x"
+        ) &
+    done
+    for _ in $(jobs -p); do
+        wait -n
+    done
+)
 (
     flags=(
-        -fdiagnostics-color=always
-        -outputdir "$WD/build"
+        "-fdiagnostics-color=always"
+        -funbox-strict-fields
+        "-optc -ferror-limit=1"
+        "-optc -fno-math-errno"
+        "-optc -fshort-enums"
+        "-optc -O3"
+        "-optc -Werror"
+        "-optc -Weverything"
+        "-optc -Wno-bad-function-cast"
+        "-optc -Wno-cast-qual"
+        "-optc -Wno-flexible-array-extensions"
+        "-optc -Wno-implicit-int-conversion"
+        "-optc -Wno-padded"
+        "-optc -Wno-reserved-id-macro"
+        "-optc -Wno-shorten-64-to-32"
+        "-optc -Wno-sign-conversion"
+        "-optc -Wno-unreachable-code-return"
+        "-optl -fuse-ld=lld"
+        "-outputdir $WD/build"
+        "-pgma clang"
+        "-pgmc clang"
+        "-pgml clang"
+        "-pgmP clang"
         -Wall
         -Wcompat
         -Werror
+        -Widentities
         -Wincomplete-record-updates
         -Wincomplete-uni-patterns
         -Wmissing-export-lists
+        -Wmonomorphism-restriction
         -Wno-unused-top-binds
         -Wpartial-fields
+        -Wredundant-constraints
+        -Wunused-packages
+        -Wunused-type-patterns
     )
     files=(
         "pcg_random.c"
