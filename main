@@ -39,18 +39,19 @@ set -euo pipefail
         "-optc -Wno-bad-function-cast"
         "-optc -Wno-cast-qual"
         "-optc -Wno-flexible-array-extensions"
+        "-optc -Wno-gnu-empty-initializer"
+        "-optc -Wno-gnu-flexible-array-initializer"
         "-optc -Wno-implicit-int-conversion"
         "-optc -Wno-padded"
         "-optc -Wno-reserved-id-macro"
         "-optc -Wno-shorten-64-to-32"
         "-optc -Wno-sign-conversion"
         "-optc -Wno-unreachable-code-return"
+        "-optc -Wno-zero-length-array"
         "-optl -fuse-ld=lld"
         "-outputdir $WD/build"
         "-pgma clang"
         "-pgmc clang"
-        "-pgml clang"
-        "-pgmP clang"
         -Wall
         -Wcompat
         -Werror
